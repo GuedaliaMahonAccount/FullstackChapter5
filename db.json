@@ -5,102 +5,42 @@
             "name": "Leanne Graham",
             "username": "Bret",
             "email": "Sincere@april.biz",
-            "address": {
-                "street": "Kulas Light",
-                "city": "Gwenborough"
-            },
-            "phone": "1-770-736-8031 x56442",
-            "website": "hildegard.org",
-            "company": {
-                "name": "Romaguera-Crona",
-                "catchPhrase": "Multi-layered client-server neural-net",
-                "bs": "harness real-time e-markets"
-            }
+            "website": "hildegard.org"
         },
         {
             "id": 2,
             "name": "Ervin Howell",
             "username": "Antonette",
             "email": "Shanna@melissa.tv",
-            "address": {
-                "street": "Victor Plains",
-                "city": "Wisokyburgh"
-            },
-            "phone": "010-692-6593 x09125",
-            "website": "anastasia.net",
-            "company": {
-                "name": "Deckow-Crist",
-                "catchPhrase": "Proactive didactic contingency",
-                "bs": "synergize scalable supply-chains"
-            }
+            "website": "anastasia.net"
         },
         {
             "id": 3,
             "name": "Clementine Bauch",
             "username": "Samantha",
             "email": "Nathan@yesenia.net",
-            "address": {
-                "street": "Douglas Extension",
-                "city": "McKenziehaven"
-            },
-            "phone": "1-463-123-4447",
-            "website": "ramiro.info",
-            "company": {
-                "name": "Romaguera-Jacobson",
-                "catchPhrase": "Face to face bifurcated interface",
-                "bs": "e-enable strategic applications"
-            }
+            "website": "ramiro.info"
         },
         {
             "id": 4,
             "name": "Patricia Lebsack",
             "username": "Karianne",
             "email": "Julianne.OConner@kory.org",
-            "address": {
-                "street": "Hoeger Mall",
-                "city": "South Elvis"
-            },
-            "phone": "493-170-9623 x156",
-            "website": "kale.biz",
-            "company": {
-                "name": "Robel-Corkery",
-                "catchPhrase": "Multi-tiered zero tolerance productivity",
-                "bs": "transition cutting-edge web services"
-            }
+            "website": "kale.biz"
         },
         {
             "id": 5,
             "name": "Chelsey Dietrich",
             "username": "Kamren",
             "email": "Lucio_Hettinger@annie.ca",
-            "address": {
-                "street": "Skiles Walks",
-                "city": "Roscoeview"
-            },
-            "phone": "(254)954-1289",
-            "website": "demarco.info",
-            "company": {
-                "name": "Keebler LLC",
-                "catchPhrase": "User-centric fault-tolerant solution",
-                "bs": "revolutionize end-to-end systems"
-            }
+            "website": "demarco.info"
         },
         {
             "id": 6,
             "name": "Mrs. Dennis Schulist",
             "username": "Leopoldo_Corkery",
             "email": "Karley_Dach@jasper.info",
-            "address": {
-                "street": "Norberto Crossing",
-                "city": "South Christy"
-            },
-            "phone": "1-477-935-8478 x6430",
-            "website": "ola.org",
-            "company": {
-                "name": "Considine-Lockman",
-                "catchPhrase": "Synchronised bottom-line interface",
-                "bs": "e-enable innovative applications"
-            }
+            "website": "ola.org"
         }
     ],
     "posts": [
