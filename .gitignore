@@ -4,6 +4,7 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -70,6 +71,9 @@ web_modules/
 .env.*
 !.env.example
 
+# Local environment files
+*.local
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
@@ -81,6 +85,7 @@ out
 # Nuxt.js build / generate output
 .nuxt
 dist
+dist-ssr
 .output
 
 # Gatsby files
@@ -124,6 +129,17 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # pnpm
 .pnpm-store
