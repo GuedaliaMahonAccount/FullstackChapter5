@@ -5,7 +5,9 @@ import UserDetailsSignup from './routes/UserDetailsSignup';
 import Home from './routes/Home';
 import Todos from './routes/Todos';
 import Posts from './routes/Posts';
+import Comments from './routes/Comments';
 import Albums from './routes/Albums';
+import Photos from './routes/Photos';
 
 function App() {
   return (
@@ -17,7 +19,9 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/users/:userId/todos" element={<Todos />} />
       <Route path="/users/:userId/posts" element={<Posts />} />
+      <Route path="/users/:userId/posts/:postId/comments" element={<Comments />} />
       <Route path="/users/:userId/albums" element={<Albums />} />
+      <Route path="/users/:userId/albums/:albumId/photos" element={<Photos />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
