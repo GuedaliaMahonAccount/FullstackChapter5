@@ -3,7 +3,10 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
 
   // Search
@@ -29,40 +32,36 @@ const Albums = () => {
   const { userId } = useParams();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (!storedUser) {
+    if (!user) {
       navigate('/login');
       return;
     }
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
-
-    if (parsedUser.id.toString() !== userId) {
-      navigate(`/users/${parsedUser.id}/albums`);
+    if (user.id.toString() !== userId) {
+      navigate(`/users/${user.id}/albums`);
       return;
     }
 
-    fetchAlbums(parsedUser.id);
-  }, [navigate, userId]);
-
-  const fetchAlbums = async (uid) => {
-    try {
-      const cached = sessionStorage.getItem(`albums_data_${uid}`);
-      if (cached) {
-        setAlbums(JSON.parse(cached));
+    const fetchAlbums = async () => {
+      try {
+        const cached = sessionStorage.getItem(`albums_data_${user.id}`);
+        if (cached) {
+          setAlbums(JSON.parse(cached));
+          setLoading(false);
+          return;
+        }
+        const response = await fetch(`http://localhost:3000/albums?userId=${user.id}`);
+        const data = await response.json();
+        setAlbums(data);
+        sessionStorage.setItem(`albums_data_${user.id}`, JSON.stringify(data));
+      } catch (error) {
+        console.error("Error fetching albums:", error);
+      } finally {
         setLoading(false);
-        return;
       }
-      const response = await fetch(`http://localhost:3000/albums?userId=${uid}`);
-      const data = await response.json();
-      setAlbums(data);
-      sessionStorage.setItem(`albums_data_${uid}`, JSON.stringify(data));
-    } catch (error) {
-      console.error("Error fetching albums:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchAlbums();
+  }, [navigate, userId, user]);
 
   useEffect(() => {
     if (user && !loading) {
@@ -82,7 +81,7 @@ const Albums = () => {
       const data = await response.json();
       setPhotos(data);
       sessionStorage.setItem(`photos_data_${albumId}`, JSON.stringify(data));
-      setVisiblePhotosCount(10); // reset pagination
+      setVisiblePhotosCount(10);
     } catch (error) {
       console.error("Error fetching photos:", error);
     }
@@ -123,8 +122,8 @@ const Albums = () => {
     e.preventDefault();
     if (!newPhotoTitle.trim() || !newPhotoUrl.trim() || !selectedAlbum) return;
 
-    const newPhoto = { 
-      albumId: isNaN(Number(selectedAlbum.id)) ? selectedAlbum.id : Number(selectedAlbum.id), 
+    const newPhoto = {
+      albumId: isNaN(Number(selectedAlbum.id)) ? selectedAlbum.id : Number(selectedAlbum.id),
       title: newPhotoTitle,
       url: newPhotoUrl,
       thumbnailUrl: newPhotoUrl
@@ -233,9 +232,9 @@ const Albums = () => {
             <h2 className="title">{selectedAlbum.title}</h2>
 
             <form onSubmit={handleAddPhoto} className="flex gap-2 mb-6 mt-4">
-              <input type="text" className="input" placeholder="New photo title" value={newPhotoTitle} onChange={e => setNewPhotoTitle(e.target.value)} style={{marginBottom: 0, flex: 1}} required />
-              <input type="url" className="input" placeholder="Photo URL (http://...)" value={newPhotoUrl} onChange={e => setNewPhotoUrl(e.target.value)} style={{marginBottom: 0, flex: 1}} required />
-              <button type="submit" className="btn" style={{width: 'auto'}}>Add Photo</button>
+              <input type="text" className="input" placeholder="New photo title" value={newPhotoTitle} onChange={e => setNewPhotoTitle(e.target.value)} style={{ marginBottom: 0, flex: 1 }} required />
+              <input type="url" className="input" placeholder="Photo URL (http://...)" value={newPhotoUrl} onChange={e => setNewPhotoUrl(e.target.value)} style={{ marginBottom: 0, flex: 1 }} required />
+              <button type="submit" className="btn" style={{ width: 'auto' }}>Add Photo</button>
             </form>
 
             {photos.length === 0 ? (
@@ -244,19 +243,18 @@ const Albums = () => {
               <div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem' }}>
                   {visiblePhotos.map(photo => (
-                    <div key={photo.id} style={{border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden'}}>
-                      {/* Using picsum fallback only for original placeholder images, user's URLs are shown directly */}
-                      <img 
-                        src={photo.thumbnailUrl && photo.thumbnailUrl.includes('via.placeholder.com') ? `https://picsum.photos/150/150?random=${photo.id}` : (photo.thumbnailUrl || photo.url)} 
-                        alt={photo.title} 
-                        style={{width: '100%', height: '150px', objectFit: 'cover', display: 'block'}} 
-                        onError={(e) => { e.target.src = 'https://picsum.photos/150/150?blur=2' }}
+                    <div key={photo.id} style={{ border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+                      <img
+                        src={photo.thumbnailUrl && photo.thumbnailUrl.includes('via.placeholder.com') ? `https://picsum.photos/150/150?random=${photo.id}` : (photo.thumbnailUrl || photo.url)}
+                        alt={photo.title}
+                        style={{ width: '100%', height: '150px', objectFit: 'cover', display: 'block' }}
+                        onError={(e) => { e.target.src = 'https://picsum.photos/150/150?blur=2'; }}
                       />
                       <div style={{ padding: '0.5rem', background: 'var(--bg)' }}>
                         <input
                           type="text"
-                          value={photo.title}
-                          onChange={(e) => handleUpdatePhotoTitle(photo.id, e.target.value)}
+                          defaultValue={photo.title}
+                          onBlur={(e) => handleUpdatePhotoTitle(photo.id, e.target.value)}
                           className="input"
                           style={{ padding: '0.25rem', marginBottom: '0.5rem', fontSize: '0.75rem' }}
                         />

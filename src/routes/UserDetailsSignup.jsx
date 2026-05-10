@@ -50,6 +50,8 @@ const UserDetailsSignup = () => {
       }
     } catch (err) {
       setError('Error connecting to server. Please ensure JSON server is running.');
+      console.log(err);
+      
     } finally {
       setIsLoading(false);
     }

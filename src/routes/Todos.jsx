@@ -3,7 +3,10 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
 
   // Search & Sort states
@@ -24,42 +27,38 @@ const Todos = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (!storedUser) {
-      navigate('/login');
-      return;
-    }
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
+useEffect(() => {
+  if (!user) {
+    navigate('/login');
+    return;
+  }
+  if (user.id.toString() !== userId) {
+    navigate(`/users/${user.id}/todos`);
+    return;
+  }
 
-    // Check if the route parameter matches the logged-in user
-    if (parsedUser.id.toString() !== userId) {
-      navigate(`/users/${parsedUser.id}/todos`);
-      return;
-    }
-
-    fetchTodos(parsedUser.id);
-  }, [navigate, userId]);
-
-  const fetchTodos = async (uid) => {
+  const fetchTodos = async () => {
     try {
-      const cached = sessionStorage.getItem(`todos_data_${uid}`);
+      const cached = sessionStorage.getItem(`todos_data_${user.id}`);
       if (cached) {
         setTodos(JSON.parse(cached));
         setLoading(false);
         return;
       }
-      const response = await fetch(`http://localhost:3000/todos?userId=${uid}`);
+      const response = await fetch(`http://localhost:3000/todos?userId=${user.id}`);
       const data = await response.json();
       setTodos(data);
-      sessionStorage.setItem(`todos_data_${uid}`, JSON.stringify(data));
+      sessionStorage.setItem(`todos_data_${user.id}`, JSON.stringify(data));
     } catch (error) {
-      console.error("Error fetching todos:", error);
+      console.error('Error fetching todos:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  fetchTodos();
+}, [navigate, userId, user]);
+
 
   useEffect(() => {
     if (user && !loading) {

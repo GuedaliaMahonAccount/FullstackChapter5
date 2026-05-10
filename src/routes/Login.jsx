@@ -38,13 +38,15 @@ const Login = () => {
       }
     } catch (err) {
       setError('Error connecting to server. Please ensure JSON server is running.');
+      console.log(err);
+      
     }
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="card max-w-md w-full">
-        <h1 className="title text-center">Welcome Back</h1>
+        <h1 className="title text-center">Welcome</h1>
         <p className="subtitle text-center">Please enter your details to sign in.</p>
         
         {error && <div className="error">{error}</div>}
@@ -54,6 +56,7 @@ const Login = () => {
             <label htmlFor="username">Username</label>
             <input
               id="username"
+              placeholder='Username'
               type="text"
               className="input mt-4"
               value={username}
@@ -66,6 +69,7 @@ const Login = () => {
             <label htmlFor="password">Password</label>
             <input
               id="password"
+              placeholder='password'
               type="password"
               className="input mt-4"
               value={password}

@@ -3,7 +3,10 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(null);
+  const [user] = useState(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
 
   // Search
@@ -29,40 +32,36 @@ const Posts = () => {
   const { userId } = useParams();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    if (!storedUser) {
+    if (!user) {
       navigate('/login');
       return;
     }
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
-
-    if (parsedUser.id.toString() !== userId) {
-      navigate(`/users/${parsedUser.id}/posts`);
+    if (user.id.toString() !== userId) {
+      navigate(`/users/${user.id}/posts`);
       return;
     }
 
-    fetchPosts(parsedUser.id);
-  }, [navigate, userId]);
-
-  const fetchPosts = async (uid) => {
-    try {
-      const cached = sessionStorage.getItem(`posts_data_${uid}`);
-      if (cached) {
-        setPosts(JSON.parse(cached));
+    const fetchPosts = async () => {
+      try {
+        const cached = sessionStorage.getItem(`posts_data_${user.id}`);
+        if (cached) {
+          setPosts(JSON.parse(cached));
+          setLoading(false);
+          return;
+        }
+        const response = await fetch(`http://localhost:3000/posts?userId=${user.id}`);
+        const data = await response.json();
+        setPosts(data);
+        sessionStorage.setItem(`posts_data_${user.id}`, JSON.stringify(data));
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
         setLoading(false);
-        return;
       }
-      const response = await fetch(`http://localhost:3000/posts?userId=${uid}`);
-      const data = await response.json();
-      setPosts(data);
-      sessionStorage.setItem(`posts_data_${uid}`, JSON.stringify(data));
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchPosts();
+  }, [navigate, userId, user]);
 
   useEffect(() => {
     if (user && !loading) {
@@ -156,7 +155,6 @@ const Posts = () => {
     e.preventDefault();
     if (!newCommentBody.trim() || !selectedPost) return;
 
-    // Use current user's email for identifying their comments
     const newComment = {
       postId: isNaN(Number(selectedPost.id)) ? selectedPost.id : Number(selectedPost.id),
       name: user.name,
@@ -219,7 +217,7 @@ const Posts = () => {
         </div>
         <div className="flex gap-2">
           <Link to="/home" className="btn-secondary">Back to Home</Link>
-          <button onClick={() => { localStorage.removeItem('currentUser'); navigate('/login'); }} className="btn-danger" style={{color: 'white', padding: '0.5rem 1rem'}}>Logout</button>
+          <button onClick={() => { localStorage.removeItem('currentUser'); navigate('/login'); }} className="btn-danger" style={{ color: 'white', padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 
@@ -270,8 +268,8 @@ const Posts = () => {
               <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Edit Content:</label>
               <textarea
                 className="input"
-                value={selectedPost.body}
-                onChange={(e) => handleUpdatePost(selectedPost, e.target.value)}
+                defaultValue={selectedPost.body}
+                onBlur={(e) => handleUpdatePost(selectedPost, e.target.value)}
                 rows={5}
               />
             </div>
@@ -297,8 +295,8 @@ const Posts = () => {
                           <input
                             className="input"
                             style={{ padding: '0.25rem', marginBottom: 0, fontSize: '0.85rem' }}
-                            value={c.body}
-                            onChange={(e) => handleUpdateComment(c.id, e.target.value)}
+                            defaultValue={c.body}
+                            onBlur={(e) => handleUpdateComment(c.id, e.target.value)}
                           />
                         ) : (
                           <p style={{ margin: 0 }}>{c.body}</p>
