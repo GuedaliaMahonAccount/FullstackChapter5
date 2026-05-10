@@ -14,7 +14,14 @@ const Photos = () => {
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
 
   const navigate = useNavigate();
-  const { userId, albumId } = useParams();
+  const { userId, albumId, photoId } = useParams();
+
+  // Derive the selected photo directly from the URL param — no state needed
+  const selectedPhoto = photoId
+    ? photos.find(p => p.id.toString() === photoId) || null
+    : null;
+
+  const closeModal = () => navigate(`/users/${userId}/albums/${albumId}/photos`);
 
   useEffect(() => {
     if (!user) {
@@ -82,6 +89,7 @@ const Photos = () => {
     try {
       await fetch(`http://localhost:3000/photos/${id}`, { method: 'DELETE' });
       setPhotos(photos.filter(p => p.id !== id));
+      if (photoId === id.toString()) closeModal();
     } catch (error) {
       console.error('Error deleting photo:', error);
     }
@@ -161,8 +169,9 @@ const Photos = () => {
                       ? `https://picsum.photos/160/160?random=${photo.id}`
                       : (photo.thumbnailUrl || photo.url)}
                     alt={photo.title}
-                    style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block', cursor: 'pointer' }}
                     onError={(e) => { e.target.src = 'https://picsum.photos/160/160?blur=2'; }}
+                    onClick={() => navigate(`/users/${userId}/albums/${albumId}/photos/${photo.id}`)}
                   />
                   <div style={{ padding: '0.5rem', background: 'var(--bg)' }}>
                     <input
@@ -195,6 +204,23 @@ const Photos = () => {
           </>
         )}
       </div>
+
+      {selectedPhoto && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '700px', textAlign: 'center' }}>
+            <img
+              src={selectedPhoto.url && selectedPhoto.url.includes('via.placeholder.com')
+                ? `https://picsum.photos/600/400?random=${selectedPhoto.id}`
+                : selectedPhoto.url}
+              alt={selectedPhoto.title}
+              style={{ width: '100%', maxHeight: '60vh', objectFit: 'contain', borderRadius: '12px', display: 'block' }}
+              onError={(e) => { e.target.src = 'https://picsum.photos/600/400?blur=2'; }}
+            />
+            <p style={{ marginTop: '1rem', fontWeight: 500 }}>{selectedPhoto.title}</p>
+            <button onClick={closeModal} className="btn mt-4" style={{ width: 'auto' }}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

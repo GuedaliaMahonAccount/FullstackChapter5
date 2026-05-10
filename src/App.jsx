@@ -22,6 +22,7 @@ function App() {
       <Route path="/users/:userId/posts/:postId/comments" element={<Comments />} />
       <Route path="/users/:userId/albums" element={<Albums />} />
       <Route path="/users/:userId/albums/:albumId/photos" element={<Photos />} />
+      <Route path="/users/:userId/albums/:albumId/photos/:photoId" element={<Photos />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
