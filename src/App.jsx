@@ -17,6 +17,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/register/details" element={<UserDetailsSignup />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/home/:userId/info" element={<Home />} />
       <Route path="/users/:userId/todos" element={<Todos />} />
       <Route path="/users/:userId/posts" element={<Posts />} />
       <Route path="/users/:userId/posts/:postId/comments" element={<Comments />} />

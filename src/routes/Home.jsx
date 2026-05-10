@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, Link, useMatch } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 
 const Home = () => {
-  const [showInfo, setShowInfo] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useUser();
+  const infoMatch = useMatch('/home/:userId/info');
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -28,7 +28,7 @@ const Home = () => {
           <Link to={`/users/${user.id}/albums`} className="btn-secondary">Albums</Link>
           <Link to={`/users/${user.id}/posts`} className="btn-secondary">Posts</Link>
           <Link to={`/users/${user.id}/todos`} className="btn-secondary">Todos</Link>
-          <button onClick={() => setShowInfo(true)} className="btn-secondary">Info</button>
+          <button onClick={() => navigate(`/home/${user.id}/info`)} className="btn-secondary">Info</button>
           <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
@@ -43,8 +43,8 @@ const Home = () => {
         </div>
       </div>
 
-      {showInfo && (
-        <div className="modal-overlay" onClick={() => setShowInfo(false)}>
+      {infoMatch && (
+        <div className="modal-overlay" onClick={() => navigate('/home')}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2 className="title mb-4">User Information</h2>
             <div className="flex-col gap-2">
@@ -56,7 +56,7 @@ const Home = () => {
               <p><strong>Company:</strong> {user.company?.name}</p>
               <p><strong>ID:</strong> {user.id}</p>
             </div>
-            <button onClick={() => setShowInfo(false)} className="btn mt-4">Close</button>
+            <button onClick={() => navigate('/home')} className="btn mt-4">Close</button>
           </div>
         </div>
       )}
