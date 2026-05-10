@@ -4,14 +4,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const UserDetailsSignup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [street, setStreet] = useState('');
+  const [suite, setSuite] = useState('');
+  const [city, setCity] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // If user arrived here without going through the register page, redirect
     if (!location.state || !location.state.username || !location.state.password) {
       navigate('/register');
     }
@@ -28,21 +33,31 @@ const UserDetailsSignup = () => {
       name,
       username,
       email,
-      website: password // Project instruction: use website field as password
+      address: {
+        street,
+        suite,
+        city,
+        zipcode,
+        geo: { lat: '0', lng: '0' }
+      },
+      phone,
+      website: password,
+      company: {
+        name: companyName,
+        catchPhrase: '',
+        bs: ''
+      }
     };
 
     try {
       const response = await fetch('http://localhost:3000/users', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newUser),
       });
 
       if (response.ok) {
         const savedUser = await response.json();
-        // Log them in immediately and redirect to home
         localStorage.setItem('currentUser', JSON.stringify(savedUser));
         navigate('/home');
       } else {
@@ -51,7 +66,6 @@ const UserDetailsSignup = () => {
     } catch (err) {
       setError('Error connecting to server. Please ensure JSON server is running.');
       console.log(err);
-      
     } finally {
       setIsLoading(false);
     }
@@ -64,34 +78,50 @@ const UserDetailsSignup = () => {
       <div className="card max-w-md w-full">
         <h1 className="title text-center">Complete Profile</h1>
         <p className="subtitle text-center">Tell us a bit more about yourself.</p>
-        
+
         {error && <div className="error">{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className="flex-col">
           <div>
             <label htmlFor="name">Full Name</label>
-            <input
-              id="name"
-              type="text"
-              className="input mt-4"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
+            <input id="name" type="text" className="input mt-4" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
-          
+
           <div>
             <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              className="input mt-4"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <input id="email" type="email" className="input mt-4" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-          
+
+          <div>
+            <label htmlFor="phone">Phone</label>
+            <input id="phone" type="tel" className="input mt-4" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+          </div>
+
+          <div>
+            <label htmlFor="street">Street</label>
+            <input id="street" type="text" className="input mt-4" value={street} onChange={(e) => setStreet(e.target.value)} required />
+          </div>
+
+          <div>
+            <label htmlFor="suite">Suite / Apt</label>
+            <input id="suite" type="text" className="input mt-4" value={suite} onChange={(e) => setSuite(e.target.value)} />
+          </div>
+
+          <div>
+            <label htmlFor="city">City</label>
+            <input id="city" type="text" className="input mt-4" value={city} onChange={(e) => setCity(e.target.value)} required />
+          </div>
+
+          <div>
+            <label htmlFor="zipcode">Zip Code</label>
+            <input id="zipcode" type="text" className="input mt-4" value={zipcode} onChange={(e) => setZipcode(e.target.value)} required />
+          </div>
+
+          <div>
+            <label htmlFor="companyName">Company Name</label>
+            <input id="companyName" type="text" className="input mt-4" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+          </div>
+
           <button type="submit" className="btn mt-4" disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Finish Registration'}
           </button>
