@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const Comments = () => {
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
-  const [user] = useState(() => {
-    const stored = localStorage.getItem('currentUser');
-    return stored ? JSON.parse(stored) : null;
-  });
   const [loading, setLoading] = useState(true);
   const [newCommentBody, setNewCommentBody] = useState('');
 
   const navigate = useNavigate();
   const { userId, postId } = useParams();
+  const { user } = useUser();
 
   useEffect(() => {
     if (!user) {

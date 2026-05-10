@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
-  const [user] = useState(() => {
-    const stored = localStorage.getItem('currentUser');
-    return stored ? JSON.parse(stored) : null;
-  });
   const [loading, setLoading] = useState(true);
 
   const [searchId, setSearchId] = useState(sessionStorage.getItem('albums_searchId') || '');
@@ -16,6 +13,7 @@ const Albums = () => {
 
   const navigate = useNavigate();
   const { userId } = useParams();
+  const { user } = useUser();
 
   useEffect(() => {
     sessionStorage.setItem('albums_searchId', searchId);

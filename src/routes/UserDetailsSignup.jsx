@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const UserDetailsSignup = () => {
   const [name, setName] = useState('');
@@ -15,6 +16,7 @@ const UserDetailsSignup = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useUser();
 
   useEffect(() => {
     if (!location.state || !location.state.username || !location.state.password) {
@@ -58,14 +60,13 @@ const UserDetailsSignup = () => {
 
       if (response.ok) {
         const savedUser = await response.json();
-        localStorage.setItem('currentUser', JSON.stringify(savedUser));
+        login(savedUser);
         navigate('/home');
       } else {
         setError('Failed to create user');
       }
-    } catch (err) {
+    } catch {
       setError('Error connecting to server. Please ensure JSON server is running.');
-      console.log(err);
     } finally {
       setIsLoading(false);
     }
@@ -86,42 +87,34 @@ const UserDetailsSignup = () => {
             <label htmlFor="name">Full Name</label>
             <input id="name" type="text" className="input mt-4" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="email">Email</label>
             <input id="email" type="email" className="input mt-4" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="phone">Phone</label>
             <input id="phone" type="tel" className="input mt-4" value={phone} onChange={(e) => setPhone(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="street">Street</label>
             <input id="street" type="text" className="input mt-4" value={street} onChange={(e) => setStreet(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="suite">Suite / Apt</label>
             <input id="suite" type="text" className="input mt-4" value={suite} onChange={(e) => setSuite(e.target.value)} />
           </div>
-
           <div>
             <label htmlFor="city">City</label>
             <input id="city" type="text" className="input mt-4" value={city} onChange={(e) => setCity(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="zipcode">Zip Code</label>
             <input id="zipcode" type="text" className="input mt-4" value={zipcode} onChange={(e) => setZipcode(e.target.value)} required />
           </div>
-
           <div>
             <label htmlFor="companyName">Company Name</label>
             <input id="companyName" type="text" className="input mt-4" value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
           </div>
-
           <button type="submit" className="btn mt-4" disabled={isLoading}>
             {isLoading ? 'Saving...' : 'Finish Registration'}
           </button>

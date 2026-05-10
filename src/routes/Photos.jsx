@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const Photos = () => {
   const [album, setAlbum] = useState(null);
   const [photos, setPhotos] = useState([]);
-  const [user] = useState(() => {
-    const stored = localStorage.getItem('currentUser');
-    return stored ? JSON.parse(stored) : null;
-  });
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(10);
   const [newPhotoTitle, setNewPhotoTitle] = useState('');
@@ -15,6 +12,7 @@ const Photos = () => {
 
   const navigate = useNavigate();
   const { userId, albumId, photoId } = useParams();
+  const { user } = useUser();
 
   // Derive the selected photo directly from the URL param — no state needed
   const selectedPhoto = photoId

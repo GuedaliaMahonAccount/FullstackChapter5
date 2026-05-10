@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const Todos = () => {
   const [todos, setTodos] = useState([]);
-  const [user] = useState(() => {
-    const storedUser = localStorage.getItem('currentUser');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
   const [loading, setLoading] = useState(true);
 
-  // Search & Sort states
   const [searchId, setSearchId] = useState(sessionStorage.getItem('todos_searchId') || '');
   const [searchTitle, setSearchTitle] = useState(sessionStorage.getItem('todos_searchTitle') || '');
   const [searchCompleted, setSearchCompleted] = useState(sessionStorage.getItem('todos_searchCompleted') || 'all');
   const [sortBy, setSortBy] = useState(sessionStorage.getItem('todos_sortBy') || 'id');
+
+  const [newTodoTitle, setNewTodoTitle] = useState('');
+
+  const navigate = useNavigate();
+  const { userId } = useParams();
+  const { user } = useUser();
 
   useEffect(() => {
     sessionStorage.setItem('todos_searchId', searchId);
@@ -22,43 +24,37 @@ const Todos = () => {
     sessionStorage.setItem('todos_sortBy', sortBy);
   }, [searchId, searchTitle, searchCompleted, sortBy]);
 
-  const [newTodoTitle, setNewTodoTitle] = useState('');
-
-  const navigate = useNavigate();
-  const { userId } = useParams();
-
-useEffect(() => {
-  if (!user) {
-    navigate('/login');
-    return;
-  }
-  if (user.id.toString() !== userId) {
-    navigate(`/users/${user.id}/todos`);
-    return;
-  }
-
-  const fetchTodos = async () => {
-    try {
-      const cached = sessionStorage.getItem(`todos_data_${user.id}`);
-      if (cached) {
-        setTodos(JSON.parse(cached));
-        setLoading(false);
-        return;
-      }
-      const response = await fetch(`http://localhost:3000/todos?userId=${user.id}`);
-      const data = await response.json();
-      setTodos(data);
-      sessionStorage.setItem(`todos_data_${user.id}`, JSON.stringify(data));
-    } catch (error) {
-      console.error('Error fetching todos:', error);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+      return;
     }
-  };
+    if (user.id.toString() !== userId) {
+      navigate(`/users/${user.id}/todos`);
+      return;
+    }
 
-  fetchTodos();
-}, [navigate, userId, user]);
+    const loadTodos = async () => {
+      try {
+        const cached = sessionStorage.getItem(`todos_data_${user.id}`);
+        if (cached) {
+          setTodos(JSON.parse(cached));
+          setLoading(false);
+          return;
+        }
+        const response = await fetch(`http://localhost:3000/todos?userId=${user.id}`);
+        const data = await response.json();
+        setTodos(data);
+        sessionStorage.setItem(`todos_data_${user.id}`, JSON.stringify(data));
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    loadTodos();
+  }, [navigate, userId, user]);
 
   useEffect(() => {
     if (user && !loading) {
@@ -86,7 +82,7 @@ useEffect(() => {
       setTodos([...todos, data]);
       setNewTodoTitle('');
     } catch (error) {
-      console.error("Error adding todo:", error);
+      console.error('Error adding todo:', error);
     }
   };
 
@@ -101,31 +97,27 @@ useEffect(() => {
         setTodos(todos.map(t => t.id === todo.id ? { ...t, ...updates } : t));
       }
     } catch (error) {
-      console.error("Error updating todo:", error);
+      console.error('Error updating todo:', error);
     }
   };
 
   const handleDeleteTodo = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/todos/${id}`, {
-        method: 'DELETE'
-      });
+      const response = await fetch(`http://localhost:3000/todos/${id}`, { method: 'DELETE' });
       if (response.ok) {
         setTodos(todos.filter(t => t.id !== id));
       }
     } catch (error) {
-      console.error("Error deleting todo:", error);
+      console.error('Error deleting todo:', error);
     }
   };
 
-  // Filter and Sort logic
   const filteredTodos = todos.filter(t => {
     const matchId = searchId === '' || t.id.toString().includes(searchId);
     const matchTitle = searchTitle === '' || t.title.toLowerCase().includes(searchTitle.toLowerCase());
     const matchCompleted = searchCompleted === 'all'
       ? true
       : (searchCompleted === 'true' ? t.completed : !t.completed);
-
     return matchId && matchTitle && matchCompleted;
   }).sort((a, b) => {
     if (sortBy === 'id') return String(a.id).localeCompare(String(b.id), undefined, { numeric: true });
@@ -140,9 +132,7 @@ useEffect(() => {
     <div className="container min-h-screen">
       <nav className="nav justify-between">
         <div className="flex gap-2 items-center">
-          <Link to="/home" style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>
-            MyApp
-          </Link>
+          <Link to="/home" style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>MyApp</Link>
           <span>/ Todos</span>
         </div>
         <div className="flex gap-2">
@@ -153,20 +143,11 @@ useEffect(() => {
       <div className="card">
         <h1 className="title mb-6">My Todos</h1>
 
-        {/* Add Todo */}
         <form onSubmit={handleAddTodo} className="flex gap-2 mb-6">
-          <input
-            type="text"
-            className="input"
-            style={{ marginBottom: 0 }}
-            placeholder="Add new todo..."
-            value={newTodoTitle}
-            onChange={(e) => setNewTodoTitle(e.target.value)}
-          />
+          <input type="text" className="input" style={{ marginBottom: 0 }} placeholder="Add new todo..." value={newTodoTitle} onChange={(e) => setNewTodoTitle(e.target.value)} />
           <button type="submit" className="btn" style={{ width: 'auto' }}>Add</button>
         </form>
 
-        {/* Filters & Sorting */}
         <div className="filters-box">
           <div>
             <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Search ID</label>
@@ -194,7 +175,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Todo List */}
         <div className="flex-col gap-2">
           {filteredTodos.length === 0 ? (
             <p className="text-center">No todos found.</p>

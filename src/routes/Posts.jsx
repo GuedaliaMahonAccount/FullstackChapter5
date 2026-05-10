@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import useUser from '../hooks/useUser';
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
-  const [user] = useState(() => {
-    const stored = localStorage.getItem('currentUser');
-    return stored ? JSON.parse(stored) : null;
-  });
   const [loading, setLoading] = useState(true);
 
   const [searchId, setSearchId] = useState(sessionStorage.getItem('posts_searchId') || '');
@@ -18,6 +15,7 @@ const Posts = () => {
 
   const navigate = useNavigate();
   const { userId } = useParams();
+  const { user, logout } = useUser();
 
   useEffect(() => {
     sessionStorage.setItem('posts_searchId', searchId);
@@ -134,7 +132,7 @@ const Posts = () => {
         </div>
         <div className="flex gap-2">
           <Link to="/home" className="btn-secondary">Back to Home</Link>
-          <button onClick={() => { localStorage.removeItem('currentUser'); navigate('/login'); }} className="btn-danger" style={{ color: 'white', padding: '0.5rem 1rem' }}>Logout</button>
+          <button onClick={() => { logout(); navigate('/login'); }} className="btn-danger" style={{ color: 'white', padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 
