@@ -132,7 +132,6 @@ const Posts = () => {
         </div>
         <div className="flex gap-2">
           <Link to="/home" className="btn-secondary">Back to Home</Link>
-          <button onClick={() => { logout(); navigate('/login'); }} className="btn-danger" style={{ color: 'white', padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 
