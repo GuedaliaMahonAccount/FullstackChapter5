@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import useUser from '../hooks/useUser';
+import Navbar from '../components/Navbar';
 
 const Albums = () => {
   const [albums, setAlbums] = useState([]);
@@ -13,12 +14,7 @@ const Albums = () => {
 
   const navigate = useNavigate();
   const { userId } = useParams();
-  const { user, logout } = useUser();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user } = useUser();
 
   useEffect(() => {
     sessionStorage.setItem('albums_searchId', searchId);
@@ -105,16 +101,7 @@ const Albums = () => {
 
   return (
     <div className="container min-h-screen">
-      <nav className="nav justify-between">
-        <div className="flex gap-2 items-center">
-          <Link to="/home" style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>MyApp</Link>
-          <span>/ Albums</span>
-        </div>
-        <div className="flex gap-2">
-          <Link to="/home" className="btn-secondary">Back to Home</Link>
-          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
-        </div>
-      </nav>
+      <Navbar breadcrumb={[{ label: 'Albums' }]} />
 
       <div className="card">
         <h1 className="title mb-6">My Albums</h1>

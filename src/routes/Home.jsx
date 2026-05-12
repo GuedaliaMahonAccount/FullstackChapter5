@@ -1,37 +1,22 @@
 import { useEffect } from 'react';
 import { useNavigate, Link, useMatch } from 'react-router-dom';
 import useUser from '../hooks/useUser';
+import Navbar from '../components/Navbar';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { user, logout } = useUser();
+  const { user } = useUser();
   const infoMatch = useMatch('/home/:userId/info');
 
   useEffect(() => {
     if (!user) navigate('/login');
   }, [user, navigate]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
-
   if (!user) return null;
 
   return (
     <div className="container min-h-screen">
-      <nav className="nav justify-between">
-        <div className="flex gap-2 items-center">
-          <span style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>MyApp</span>
-        </div>
-        <div className="flex gap-2">
-          <Link to={`/users/${user.id}/albums`} className="btn-secondary">Albums</Link>
-          <Link to={`/users/${user.id}/posts`} className="btn-secondary">Posts</Link>
-          <Link to={`/users/${user.id}/todos`} className="btn-secondary">Todos</Link>
-          <button onClick={() => navigate(`/home/${user.id}/info`)} className="btn-secondary">Info</button>
-          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="card text-center" style={{ marginTop: '4rem' }}>
         <h1 className="title">Welcome, {user.name}!</h1>

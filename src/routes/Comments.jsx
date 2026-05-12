@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import useUser from '../hooks/useUser';
+import Navbar from '../components/Navbar';
 
 const Comments = () => {
   const [post, setPost] = useState(null);
@@ -10,12 +11,7 @@ const Comments = () => {
 
   const navigate = useNavigate();
   const { userId, postId } = useParams();
-  const { user, logout } = useUser();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user } = useUser();
 
   useEffect(() => {
     if (!user) {
@@ -106,17 +102,7 @@ const Comments = () => {
 
   return (
     <div className="container min-h-screen">
-      <nav className="nav justify-between">
-        <div className="flex gap-2 items-center">
-          <Link to="/home" style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>MyApp</Link>
-          <span>/ <Link to={`/users/${userId}/posts`} style={{ color: 'var(--primary)' }}>Posts</Link></span>
-          <span>/ Comments</span>
-        </div>
-        <div className="flex gap-2">
-          <Link to={`/users/${userId}/posts`} className="btn-secondary">Back to Posts</Link>
-          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
-        </div>
-      </nav>
+      <Navbar breadcrumb={[{ label: 'Posts', to: `/users/${userId}/posts` }, { label: 'Comments' }]} />
 
       <div className="card">
         {post && (

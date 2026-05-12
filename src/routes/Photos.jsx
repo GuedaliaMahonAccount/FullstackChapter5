@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import useUser from '../hooks/useUser';
+import Navbar from '../components/Navbar';
 
 const Photos = () => {
   const [album, setAlbum] = useState(null);
@@ -12,12 +13,7 @@ const Photos = () => {
 
   const navigate = useNavigate();
   const { userId, albumId, photoId } = useParams();
-  const { user, logout } = useUser();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const { user } = useUser();
 
   // Derive the selected photo directly from the URL param — no state needed
   const selectedPhoto = photoId
@@ -119,17 +115,7 @@ const Photos = () => {
 
   return (
     <div className="container min-h-screen">
-      <nav className="nav justify-between">
-        <div className="flex gap-2 items-center">
-          <Link to="/home" style={{ fontWeight: 600, fontSize: '1.25rem', color: 'var(--primary)' }}>MyApp</Link>
-          <span>/ <Link to={`/users/${userId}/albums`} style={{ color: 'var(--primary)' }}>Albums</Link></span>
-          <span>/ Photos</span>
-        </div>
-        <div className="flex gap-2">
-          <Link to={`/users/${userId}/albums`} className="btn-secondary">Back to Albums</Link>
-          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
-        </div>
-      </nav>
+      <Navbar breadcrumb={[{ label: 'Albums', to: `/users/${userId}/albums` }, { label: 'Photos' }]} />
 
       <div className="card">
         {album && (
