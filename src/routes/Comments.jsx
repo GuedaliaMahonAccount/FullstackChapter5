@@ -10,7 +10,12 @@ const Comments = () => {
 
   const navigate = useNavigate();
   const { userId, postId } = useParams();
-  const { user } = useUser();
+  const { user, logout } = useUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     if (!user) {
@@ -109,6 +114,7 @@ const Comments = () => {
         </div>
         <div className="flex gap-2">
           <Link to={`/users/${userId}/posts`} className="btn-secondary">Back to Posts</Link>
+          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 

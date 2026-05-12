@@ -13,7 +13,12 @@ const Albums = () => {
 
   const navigate = useNavigate();
   const { userId } = useParams();
-  const { user } = useUser();
+  const { user, logout } = useUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   useEffect(() => {
     sessionStorage.setItem('albums_searchId', searchId);
@@ -107,6 +112,7 @@ const Albums = () => {
         </div>
         <div className="flex gap-2">
           <Link to="/home" className="btn-secondary">Back to Home</Link>
+          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 

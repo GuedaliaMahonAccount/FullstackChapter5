@@ -12,7 +12,12 @@ const Photos = () => {
 
   const navigate = useNavigate();
   const { userId, albumId, photoId } = useParams();
-  const { user } = useUser();
+  const { user, logout } = useUser();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   // Derive the selected photo directly from the URL param — no state needed
   const selectedPhoto = photoId
@@ -122,6 +127,7 @@ const Photos = () => {
         </div>
         <div className="flex gap-2">
           <Link to={`/users/${userId}/albums`} className="btn-secondary">Back to Albums</Link>
+          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 

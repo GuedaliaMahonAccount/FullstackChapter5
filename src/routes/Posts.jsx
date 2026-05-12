@@ -17,6 +17,11 @@ const Posts = () => {
   const { userId } = useParams();
   const { user, logout } = useUser();
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   useEffect(() => {
     sessionStorage.setItem('posts_searchId', searchId);
     sessionStorage.setItem('posts_searchTitle', searchTitle);
@@ -132,6 +137,7 @@ const Posts = () => {
         </div>
         <div className="flex gap-2">
           <Link to="/home" className="btn-secondary">Back to Home</Link>
+          <button onClick={handleLogout} className="btn-danger" style={{ padding: '0.5rem 1rem' }}>Logout</button>
         </div>
       </nav>
 
